@@ -21,7 +21,7 @@ num_steps = X_train.shape[0] / batch_size
 # note need way moe variables then such as shape etc
 # TODO:  select different cost functions
 
-def accuracy(predictions, labels):
+def R2(predictions, labels):
     """ Computes the R^2 error """
     total_error = np.sum(np.square(labels - np.mean(labels)))
     unexplained_error = np.sum(np.square(labels - predictions))
@@ -29,7 +29,7 @@ def accuracy(predictions, labels):
     return R_squared
 
 
-# #Defining computation Graph
+#Defining computation Graph
 graph = tf.Graph()
 with graph.as_default():
 
@@ -40,6 +40,8 @@ with graph.as_default():
         batch_size, Y_train.shape[1]), name="Y")
     tf_val_X = tf.constant(X_val, name="X_val")
     tf_test_X = tf.constant(X_test, name="X_test")
+    import ipdb
+    ipdb.set_trace()
 
     # Variable
     weights = tf.Variable(tf.truncated_normal(
@@ -82,7 +84,7 @@ with tf.Session(graph=graph) as session:
             print("Minibatch accuracy: %f" %
                   accuracy(predictions, batch_labels))
             print("Validation accuracy: %f" % accuracy(
-                valid_prediction.eval(), Y_val)) ##why the fuck does it suddenly change size doesn't make snese
+                valid_prediction.eval(), Y_val))
             
             print("Test  accuracy at epoch %d: %f" %
               (n ,accuracy(test_prediction.eval(), Y_test)))
