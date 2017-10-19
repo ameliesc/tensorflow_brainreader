@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 from __future__ import print_function
 from data import Unwrapdata ## why does this not work???
+from sklearn.metrics import accuracy_score
 import tensorflow as tf
 import numpy as np
 #from IPython import embed
@@ -16,17 +17,14 @@ num_epochs = 100
 batch_size = 10
 num_steps = X_train.shape[0] / batch_size
 
-
+cl
 # TODO:  make generlized linear regressor (data is fd as input) -flages, argparse
 # note need way moe variables then such as shape etc
 # TODO:  select different cost functions
 
-def R2(predictions, labels):
-    """ Computes the R^2 error """
-    total_error = np.sum(np.square(labels - np.mean(labels)))
-    unexplained_error = np.sum(np.square(labels - predictions))
-    R_squared = (1 - (total_error / unexplained_error))
-    return R_squared
+def accuracy(predictions, labels):
+    return accuracy_score(predcitions, labels)
+    
 
 
 #Defining computation Graph
@@ -40,17 +38,13 @@ with graph.as_default():
         batch_size, Y_train.shape[1]), name="Y")
     tf_val_X = tf.constant(X_val, name="X_val")
     tf_test_X = tf.constant(X_test, name="X_test")
-    import ipdb
-    ipdb.set_trace()
-
-    # Variable
     weights = tf.Variable(tf.truncated_normal(
         [X_train.shape[1], Y_train.shape[1]]), name="weights")
     bias = tf.Variable(tf.zeros(Y_train.shape[1]), name="bias")
 
     predictions = tf.matmul(tf_X, weights) + bias
-    loss = tf.losses.mean_squared_error(
-        predictions=predictions, labels=tf_Y)
+    loss = tf.nn.softmax_cross_entropy_with_logits(
+        labels=tf_Y, logits=predictions,) ## since its mutliclass use this
 
 
     opt = tf.train.GradientDescentOptimizer(learning_rate=0.1).minimize(loss)
@@ -80,6 +74,7 @@ with tf.Session(graph=graph) as session:
 
 
         if (n % 10 == 0):
+            import ipdb; ipdb.set_trace()
             print("Minibatch loss at epoch  %d: %f" % (n, l))
             print("Minibatch accuracy: %f" %
                   accuracy(predictions, batch_labels))
