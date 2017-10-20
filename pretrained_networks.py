@@ -2,8 +2,6 @@ import tensorflow as tf
 from scipy.io import loadmat
 from collections import OrderedDict
 
-
-
 class Vgg19(object):
 
     def __init__(self, file_path = 'imagenet-vgg-verydeep-19.mat'):
@@ -87,7 +85,7 @@ class Vgg19(object):
             layer_x = x
             named_activations[name] = layer_x
             
-1        print("Done.")
+        print("Done.")
         return named_activations
         
 
@@ -157,13 +155,18 @@ class FcLayer(object):
         self.name = name
                                 
     def __call__(self, x):
-        import pdb; pdb.set_trace()
-        
-        print(self.w)
-        print(self.b)
-        print(x)
-
-        bias = tf.nn.bias_add(tf.matmul( self.w, , self.b)
-        return tf.nn.relu(bias)
+       # with tf.variable_scope(name) as scope:
+        shape =  x.get_shape().as_list()
+        dim = 1
+        for d in shape[1:]:
+            dim *= d
+            x = tf.reshape(x, [-1, dim])
             
+        weights = self.w
+        biases = self.b
+
+            # Fully connected layer. Note that the '+' operation automatically
+            # broadcasts the biases.
+        fc = tf.nn.bias_add(tf.matmul(x, weights), biases)
+        return fc
                      
