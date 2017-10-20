@@ -1,10 +1,7 @@
+from collections import OrderedDict
 import tensorflow as tf
 
 
-def maxpool_positions(relu_im, stride = (2, 2), region = (2, 2)):  ## this function needs to be translated into tensorflow!!!!!  probs doesnt work so how we gotta do thisss? 
-    pooled_im = max_pool_2d(relu_im, ds = region, st = stride)
-    positions = tt.grad(pooled_im.sum(), relu_im)
-    return positions
 
 
 class ConvLayer(object):
@@ -38,7 +35,7 @@ class Nonlinearity(object):
 
     def __call__(self, x):
         if self.activation  in 'relu':
-            return tf.nn.relu_layer(x, self.w, self.b, name = self.activation)
+            return tf.nn.relu_layer(x, self.w, self.b, name = self.name)
 
         elif self.activation  in 'softmax':
             return tf.nn.softmax(x, name = self.name)
@@ -61,26 +58,10 @@ class Pooler(object):
         returns: [batch, heigt/ds[0], width/ds[0], channels]
         """
         # for now leaving out average since no average pool in vgg19
-        return tf.nn.max_pool(x,self.region, self.stride, pooling = 'SAME', name = self.name)
+        return tf.nn.max_pool_with_argmax(x,self.region, self.stride, pooling = 'SAME', name = self.name) ##used argmax to work with unpooling later
 
             
-class Switches(object):
-    
-    def __init__(self, region, stride = None):
-        assert len(region) == 2, 'Region must consist of two integers.  Got: %s' % (region, )
-        if stride is None:
-            stride = region
-        assert len(stride) == 2, 'Stride must consist of two integers.  Got: %s' % (stride, )
-        self.region = region
-        self.stride = stride
 
-    def max_pool_positions(self, x, stride, region):
-        pooled_im = tf.nn.max_pool(x,self.region, self.stride, pooling = 'SAME')
-        positions = tf.gradients(pooled_im)
-
-
-    def __call__(self, x):
-        return maxpool_positions(x, stride = self.stride, region = self.region)
 
 class ConvNet(object): ## jsut copie pasted for now shuld be changed
 
