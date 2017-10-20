@@ -51,7 +51,7 @@ class Unpooler(object):
             stride = region
         assert len(stride) == 2, 'Stride must consist of two integers.  Got: %s' % (stride, )
         self.region = [1] + region + [1] # so it can be fed into tensorflow max_pool who wants a list of length 4
-        self.stride = [1] + stride + [1]
+        self.stride = [1] + stride + [1] ## todo change pool function so 2 becomes stride instead
         self.name = name
         self.indexes = indexes
 
@@ -66,7 +66,7 @@ class Unpooler(object):
             
 
 
-class ConvNet(object): ## jsut copie pasted for now shuld be changed
+class DeconvNet(object): ## jsut copie pasted for now shuld be changed
 
     def __init__(self, layers):
         """
