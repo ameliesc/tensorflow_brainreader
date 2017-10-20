@@ -1,6 +1,7 @@
 import tensorflow as tf
 from scipy.io import loadmat
 from collections import OrderedDict
+import numpy as np
 
 class Vgg19(object):
 
@@ -156,17 +157,20 @@ class FcLayer(object):
                                 
     def __call__(self, x):
        # with tf.variable_scope(name) as scope:
-        shape =  x.get_shape().as_list()
-        dim = 1
-        for d in shape[1:]:
-            dim *= d
-            x = tf.reshape(x, [-1, dim])
+
+        if x.get_shape().as_list()[1] != 1:  #basically check if pooiling layer input
+            #import pdb; pdb.set_trace()
             
-        weights = self.w
-        biases = self.b
+            shape = int(np.prod(x.get_shape()[1:]))
+            x =  tf.reshape(x, [-1, shape])
+            self.w = tf.reshape(self.w, [shape,-1])
+        
 
             # Fully connected layer. Note that the '+' operation automatically
             # broadcasts the biases.
-        fc = tf.nn.bias_add(tf.matmul(x, weights), biases)
-        return fc
+        fc = tf.nn.bias_add(tf.matmul(x, self.w), self.b)
+
+        
+        
+        return tf.nn.relu(fc)
                      
