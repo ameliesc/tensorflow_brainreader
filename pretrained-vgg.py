@@ -28,10 +28,33 @@ def get_vgg_net():
         elif layer_type == 'pool':
             pooling_mode = str(struct[2][0])
             layer  = Pooler(region=struct[3][0].tolist(), stride=struct[4][0].tolost(), mode=pooling_mode, name = layer_name)
-           # switches = # Switches(region=tuple(struct[3][0].astype(int)), stride=tuple(struct[4][0].astype(int)))
         else:
             raise Exception(
                 "Don't know about this '%s' layer type." % layer_type)
         return layer_name, layer
 
-    ## change commented functions above into tensorflow
+
+
+    print 'Loading VGG Net...'
+    #network_layers = OrderedDict(struct_to_layer(network_params['layers'][0, i][
+     #                            0, 0]) for i in xrange(network_params['layers'].shape[1]))
+    network_layers = OrderedDict()
+    for i in xrange(network_params['layers'].shape[1]):
+        layer_name, layer = struct_to_layer(network_params['layers'][0, i][
+                                 0, 0])
+        
+        network_layers[layer_name+'_layer'] = layer
+        
+        if up_to_layer == layer_name:
+            break
+                                                       
+    # if up_to_layer is not None:
+    #     if isinstance(up_to_layer, (list, tuple)):
+    #         up_to_layer = network_layers.keys()[max(
+    #             network_layers.keys().index(layer_name) for layer_name in up_to_layer)]
+    #     layer_names = [network_params['layers'][0, i][0, 0][0][0]
+    #                    for i in xrange(network_params['layers'].shape[1])]
+    #     network_layers = OrderedDict((k, network_layers[k]) for k in layer_names[
+    #                                  :layer_names.index(up_to_layer) + 1])
+    print 'Done.'
+    return ConvNet(network_layers)
