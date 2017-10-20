@@ -15,7 +15,7 @@ class ConvLayer(object):
 
                  self.w = tf.Variable(tf.constant(w, shape = w.shape))
                  self.b = tf.Variable(tf.constant(b, shape = b.shape))
-                 self.strides = tf.constant(strides)
+                 self.strides = strides
                  self.padding = padding
                  self.name = name
 
