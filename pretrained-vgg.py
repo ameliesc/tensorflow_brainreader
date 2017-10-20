@@ -11,6 +11,7 @@ def get_vgg_net():
     def struct_to_layer(struct):
         layer_type = struct[1][0]
         layer_name = str(struct[0][0])
+        indexes = None
         assert isinstance(layer_type, basestring)
         if layer_type == 'conv':
             w_orig = struct[2][0, 0]  # (n_rows, n_cols, n_in_maps, n_out_maps)
@@ -26,7 +27,7 @@ def get_vgg_net():
             layer = Nonlinearity(layer_type, name = layer_name)
         elif layer_type == 'pool':
             pooling_mode = str(struct[2][0])
-            layer  = Pooler(region=struct[3][0].tolist(), stride=struct[4][0].tolist(), mode=pooling_mode, name = layer_name)
+            layer, indexes  = Pooler(region=struct[3][0].tolist(), stride=struct[4][0].tolist(), mode=pooling_mode, name = layer_name)
         else:
             raise Exception(
                 "Don't know about this '%s' layer type." % layer_type)
@@ -42,7 +43,12 @@ def get_vgg_net():
         layer_name, layer = struct_to_layer(network_params['layers'][0, i][
                                  0, 0])
         
-        network_layers[layer_name] = layer
+       
+
+        if indexes is not None:
+            network_layers[layer_name+'_indexes'] = indexes
+
+         network_layers[layer_name+'_layer'] = layer
         
         if up_to_layer == layer_name:
             break
