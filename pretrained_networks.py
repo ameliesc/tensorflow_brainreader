@@ -12,14 +12,14 @@ class Vgg19(object):
 
         print("Building model...")
         self.network_layers = OrderedDict()
-        for i in xrange(self.network_params['layers'].shape[1]):
+        for i in range(self.network_params['layers'].shape[1]):
             struct = self.network_params['layers'][0, i][
                                  0, 0]
 
             layer_type = struct[1][0]
             layer_name = str(struct[0][0])
         
-            assert isinstance(layer_type, basestring)
+            #assert isinstance(layer_type, basestring)
             if layer_type == 'conv':
                 w = struct[2][0, 0] 
                 b = struct[2][0, 1][:, 0]
@@ -110,8 +110,7 @@ class ConvLayer(object):
         """
         x: [batch, in_height, in_width, in_channels] -> for later change greyscale ito 3d because this is how the network works tralalal
         """
-        bias = tf.nn.bias_add(tf.nn.conv2d(input = x, filter = self.w  ,strides = self.strides, padding = self.padding, name=self.name), self.b)
-        return tf.nn.relu(bias)#excluded biasterm for testing
+        return tf.nn.bias_add(tf.nn.conv2d(input = x, filter = self.w  ,strides = self.strides, padding = self.padding, name=self.name), self.b)
 
 class Nonlinearity(object):
 
@@ -163,14 +162,9 @@ class FcLayer(object):
             
             shape = int(np.prod(x.get_shape()[1:]))
             x =  tf.reshape(x, [-1, shape])
-            self.w = tf.reshape(self.w, [shape,-1])
-        
+            self.w = tf.reshape(self.w, [shape,-1]) # for some reason need to change the dimensions for weights too ..
 
-            # Fully connected layer. Note that the '+' operation automatically
-            # broadcasts the biases.
         fc = tf.nn.bias_add(tf.matmul(x, self.w), self.b)
 
-        
-        
         return tf.nn.relu(fc)
                      
