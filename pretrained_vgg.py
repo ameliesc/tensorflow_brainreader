@@ -1,17 +1,20 @@
 from scipy.io import loadmat
+from collections import OrderedDict
+from tf_convnets import Pooler, Nonlinearity, ConvLayer, ConvNet
 import numpy as np
 import tensorflow as tf
 
-def get_vgg_net():
+
+def get_vgg_net(up_to_layer = "fc8"):
     """ """
     #to do, download network automatically if not on computer yet, - find entwork on system
 
     network_params = loadmat('imagenet-vgg-verydeep-19.mat')
-
+    indexes = None
     def struct_to_layer(struct):
         layer_type = struct[1][0]
         layer_name = str(struct[0][0])
-        indexes = None
+        
         assert isinstance(layer_type, basestring)
         if layer_type == 'conv':
             w_orig = struct[2][0, 0]  # (n_rows, n_cols, n_in_maps, n_out_maps)
@@ -21,13 +24,12 @@ def get_vgg_net():
             padding = 'VALID' if layer_name.startswith('fc') else 'SAME' if layer_name.startswith(
                 'conv') else bad_value(layer_name)
             strides = struct[4][0].tolist()
-            layer = ConvLayer(w, b, strides = strides, padding = padding,
-                              border_mode=padding, name =  layer_name)
+            layer = ConvLayer(w, b, strides = strides, padding = padding, name =  layer_name)
         elif layer_type in ('relu', 'softmax'):
             layer = Nonlinearity(layer_type, name = layer_name)
         elif layer_type == 'pool':
             pooling_mode = str(struct[2][0])
-            layer, indexes  = Pooler(region=struct[3][0].tolist(), stride=struct[4][0].tolist(), mode=pooling_mode, name = layer_name)
+            layer  = Pooler(region=struct[3][0].tolist(), stride=struct[4][0].tolist(), mode=pooling_mode, name = layer_name) #not not returning indexes here!
         else:
             raise Exception(
                 "Don't know about this '%s' layer type." % layer_type)
@@ -35,7 +37,7 @@ def get_vgg_net():
 
 
 
-    print 'Loading VGG Net...'
+    print 'Loading VGG Net... '
     #network_layers = OrderedDict(struct_to_layer(network_params['layers'][0, i][
      #                            0, 0]) for i in xrange(network_params['layers'].shape[1]))
     network_layers = OrderedDict()
@@ -48,7 +50,7 @@ def get_vgg_net():
         if indexes is not None:
             network_layers[layer_name+'_indexes'] = indexes
 
-         network_layers[layer_name+'_layer'] = layer
+        network_layers[layer_name+'_layer'] = layer
         
         if up_to_layer == layer_name:
             break
