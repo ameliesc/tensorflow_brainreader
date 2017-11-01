@@ -12,10 +12,11 @@ class Vgg19():
     """ vgg is loaded in data_dict, if path of vgg19 is different call 'data_dict' the following way: data_dict("pathname")"""
     def __init__(self):
        # if vgg19_npy_path is None:
+        print("Loading...")
         self.data_dict = data_dict()
         #else:
          #   self.data_dict = data_dict(data_path)
-        print("npy file loaded")
+        print("Vgg19 network loaded.")
 
     def build(self, rgb):
         """
@@ -28,15 +29,15 @@ class Vgg19():
         rgb_scaled = rgb * 255.0
 
         # Convert RGB to BGR
-        red, green, blue = tf.split(3, 3, rgb_scaled)
+        red, green, blue = tf.split(rgb_scaled, 3,3)
         assert red.get_shape().as_list()[1:] == [224, 224, 1]
         assert green.get_shape().as_list()[1:] == [224, 224, 1]
         assert blue.get_shape().as_list()[1:] == [224, 224, 1]
-        bgr = tf.concat(3, [
+        bgr = tf.concat([
             blue - VGG_MEAN[0],
             green - VGG_MEAN[1],
             red - VGG_MEAN[2],
-        ])
+        ], 3)
         assert bgr.get_shape().as_list()[1:] == [224, 224, 3]
 
         self.conv1_1 = self.conv_layer(bgr, "conv1_1")
@@ -64,6 +65,7 @@ class Vgg19():
         self.conv5_3 = self.conv_layer(self.conv5_2, "conv5_3")
         self.conv5_4 = self.conv_layer(self.conv5_3, "conv5_4")
         self.pool5, self.argmax5 = self.max_pool(self.conv5_4, 'pool5')
+        import pdb; pdb.set_trace()
 
         self.fc6 = self.fc_layer(self.pool5, "fc6")
         assert self.fc6.get_shape().as_list()[1:] == [4096]
@@ -122,3 +124,9 @@ class Vgg19():
 
     def get_fc_weight(self, name):
         return tf.constant(self.data_dict[name][0], name="weights")
+
+
+if __name__ == '__main__':
+    net = Vgg19()
+    rand = tf.random_normal([4,224,224,3], dtype = 'float32')
+    net.build(rand)
