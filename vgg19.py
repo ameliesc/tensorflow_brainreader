@@ -105,7 +105,9 @@ class Vgg19():
     def fc_layer(self, bottom, name):
         
         weights = self.get_fc_weight(name)
-        #fc7 comes out [1,1]
+        x = bottom
+        #fc7 comes out [1,1,4096, 4096]
+        #weights= [4,4096]
         if name == 'fc6':
             with tf.variable_scope(name):
                 #
@@ -125,8 +127,14 @@ class Vgg19():
 
             # Fully connected layer. Note that the '+' operation automatically
             # broadcasts the biases.
-        fc = tf.nn.bias_add(tf.matmul(x, weights), biases)
+        if name == 'fc7' or 'fc8':
+            #import pdb; pdb.set_trace()
 
+            weights = tf.squeeze(weights)
+            #x= tf.expand_dims(tf.expand_dims(x,0),0)
+        #import pdb; pdb.set_trace()
+        fc = tf.nn.bias_add(tf.matmul(x, weights), biases)
+        
         return fc
 
     def get_conv_filter(self, name):
