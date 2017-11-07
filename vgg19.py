@@ -65,13 +65,16 @@ class Vgg19():
         self.conv5_3 = self.conv_layer(self.conv5_2, "conv5_3")
         self.conv5_4 = self.conv_layer(self.conv5_3, "conv5_4")
         self.pool5, self.argmax5 = self.max_pool(self.conv5_4, 'pool5')
-        import pdb; pdb.set_trace()
+        
 
         self.fc6 = self.fc_layer(self.pool5, "fc6")
+        
         assert self.fc6.get_shape().as_list()[1:] == [4096]
         self.relu6 = tf.nn.relu(self.fc6)
 
         self.fc7 = self.fc_layer(self.relu6, "fc7")
+        #import pdb; pdb.set_trace()
+
         self.relu7 = tf.nn.relu(self.fc7)
 
         self.fc8 = self.fc_layer(self.relu7, "fc8")
@@ -100,21 +103,31 @@ class Vgg19():
             return relu
 
     def fc_layer(self, bottom, name):
-        with tf.variable_scope(name):
-            shape = bottom.get_shape().as_list()
-            dim = 1
-            for d in shape[1:]:
-                dim *= d
-            x = tf.reshape(bottom, [-1, dim])
+        
+        weights = self.get_fc_weight(name)
+        #fc7 comes out [1,1]
+        if name == 'fc6':
+            with tf.variable_scope(name):
+                #
+                shape = bottom.get_shape().as_list()
+                dim = 1
+                for d in shape[1:]:
+                    dim *= d
+                x = tf.reshape(bottom, [-1, dim])
 
-            weights = self.get_fc_weight(name)
-            biases = self.get_bias(name)
+                dim = 1
+                shape = weights.get_shape().as_list()
+                for d in shape[0:3]:
+                    
+                    dim *= d
+                weights = tf.reshape(weights, [dim, -1])
+        biases = self.get_bias(name)
 
             # Fully connected layer. Note that the '+' operation automatically
             # broadcasts the biases.
-            fc = tf.nn.bias_add(tf.matmul(x, weights), biases)
+        fc = tf.nn.bias_add(tf.matmul(x, weights), biases)
 
-            return fc
+        return fc
 
     def get_conv_filter(self, name):
         return tf.constant(self.data_dict[name][0], name="filter")
