@@ -1,9 +1,11 @@
-import data_dict
+from data_dict import data_dict
+from collections import OrderedDict
 import tensorflow as tf
 import numpy as np
+import time
 
 
-class Vgg19_deconv(argmax_dict, data_path = None):
+class Vgg19_deconv():
     """
     Vgg19 deconvolution network that deconvolves from called layer onwards- pretty amazing eh?
     :param argmax_dict: dictionary containing the pooling argmax - can be obtained from Vgg19
@@ -20,82 +22,91 @@ class Vgg19_deconv(argmax_dict, data_path = None):
             self.data_dict = data_dict()
         else:
             self.data_dict = data_dict(data_path)
-        print("npy file loaded")
+        print("Vgg19 network loaded.")
+
+       
 
     def build(self):
         start_time = time.time()
         print("Building model...")
 
-        prob = tf.nn.softmax(fc8, name="prob")
+        #prob = tf.nn.softmax(fc8, name="prob")
         fc8 = Fc_layer( "fc8")
         fc7 = Fc_layer("fc7")
         fc6 = Fc_layer("fc6")
         unpool5= Unpool_layer(self.argmax5, 'unpool5')
-        deconv5_4 = Deconv_layer(self.get_conv_filter("deconv5_4"),self.get_bias("deconv5_4"), "deconv5_4")
-        deconv5_3 = Deconv_layer(self.get_conv_filter("deconv5_3"),self.get_bias("deconv5_3"), "deconv5_3")
-        deconv5_2 = Deconv_layerself.get_conv_filter("deconv5_2"),self.get_bias("deconv5_2"), "deconv5_2")
-        deconv5_1 = Deconv_layer(self.get_conv_filter("deconv5_1"),self.get_bias("deconv5_1"), "deconv5_1")
+        deconv5_4 = Deconv_layer(self.get_conv_filter("conv5_4"),self.get_bias("conv5_4"), "deconv5_4")
+        deconv5_3 = Deconv_layer(self.get_conv_filter("conv5_3"),self.get_bias("conv5_3"), "deconv5_3")
+        deconv5_2 = Deconv_layer(self.get_conv_filter("conv5_2"),self.get_bias("conv5_2"), "deconv5_2")
+        deconv5_1 = Deconv_layer(self.get_conv_filter("conv5_1"),self.get_bias("conv5_1"), "deconv5_1")
         unpool4 = Unpool_layer(self.argmax4, 'unpool4')
-        deconv4_4 = Deconv_layer(self.get_conv_filter("deconv4_4"),self.get_bias("deconv4_4"), "deconv4_4")
-        deconv4_3 = Deconv_layer(self.get_conv_filter("deconv4_3"),self.get_bias("deconv4_3"), "deconv4_3")
-        deconv4_2 = Deconv_layer(self.get_conv_filter("deconv4_2"),self.get_bias("deconv4_2"), "deconv4_2")
-        deconv4_1 = Deconv_layer(self.get_conv_filter("deconv4_1"),self.get_bias("deconv4_1"), "deconv4_1")
+        deconv4_4 = Deconv_layer(self.get_conv_filter("conv4_4"),self.get_bias("conv4_4"), "deconv4_4")
+        deconv4_3 = Deconv_layer(self.get_conv_filter("conv4_3"),self.get_bias("conv4_3"), "deconv4_3")
+        deconv4_2 = Deconv_layer(self.get_conv_filter("conv4_2"),self.get_bias("conv4_2"), "deconv4_2")
+        deconv4_1 = Deconv_layer(self.get_conv_filter("conv4_1"),self.get_bias("conv4_1"), "deconv4_1")
         unpool3 = Unpool_layer(self.argmax3, 'unpool3')
-        deconv3_4 = Deconv_layer(self.get_conv_filter("deconv3_4"),self.get_bias("deconv3_4"), "deconv3_4")
-        deconv3_3 = Deconv_layer(self.get_conv_filter("deconv3_3"),self.get_bias("deconv3_3"), "deconv3_3")
-        deconv3_2 = Deconv_layer(self.get_conv_filter("deconv3_2"),self.get_bias("deconv3_2"), "deconv3_2")
-        deconv3_1 = Deconv_layer(self.get_conv_filter("deconv3_1"),self.get_bias("deconv3_1"), "deconv3_1")
+        deconv3_4 = Deconv_layer(self.get_conv_filter("conv3_4"),self.get_bias("conv3_4"), "deconv3_4")
+        deconv3_3 = Deconv_layer(self.get_conv_filter("conv3_3"),self.get_bias("conv3_3"), "deconv3_3")
+        deconv3_2 = Deconv_layer(self.get_conv_filter("conv3_2"),self.get_bias("conv3_2"), "deconv3_2")
+        deconv3_1 = Deconv_layer(self.get_conv_filter("conv3_1"),self.get_bias("conv3_1"), "deconv3_1")
 
         unpool2 = Unpool_layer(self.argmax2,'unpool2')
-        deconv2_2 = Deconv_layer(self.get_conv_filter("deconv2_2"),self.get_bias("deconv2_2"), "deconv2_2")
-        deconv2_1 = Deconv_layer(self.get_conv_filter("deconv2_1"),self.get_bias("deconv2_1"), "deconv2_1")
+        deconv2_2 = Deconv_layer(self.get_conv_filter("conv2_2"),self.get_bias("conv2_2"), "deconv2_2")
+        deconv2_1 = Deconv_layer(self.get_conv_filter("conv2_1"),self.get_bias("conv2_1"), "deconv2_1")
 
         unpool1 = Unpool_layer(self.argmax1, 'unpool1')
-        deconv1_2 = Deconv_layer(self.get_conv_filter("deconv1_2"),self.get_bias("deconv1_2"), "deconv1_2")
-        deconv1_1 = Deconv_layer(self.get_conv_filter("deconv1_1"),self.get_bias("deconv1_1"),"deconv1_1"))
-        self.data_dict = None
-
-        layers_list = [prob, fc8, fc7, fc6, unpool5,deconv5_4, deconv5_3, deconv5_2,deconv5_1,unpool4,deconv4_4,deconv4_3,deconv4_2.deconv4_1,unpool3,deconv3_4,deconv3_3,deconv3_2,deconv3_1,unpool2,deconv2_2,deconv2_1,unpool1,deconv1_2,deconv1_1]
-
-        layer_names =['prob', 'fc8',
-        'relu7', 'fc7', 'relu6', 'fc6', 'pool5', '4_relu5', '4_conv5', '3_relu5', '3_conv5', '2_relu5', '2_conv5',
-        '1_relu5', '1_conv5', 'pool4', '4_relu4', '4_conv4', '3_relu4', '3_conv4', '2_relu4', '2_conv4', '1_relu4',
-        '1_conv4', 'pool3', '4_relu3', '4_conv3', '3_relu3', '3_conv3', '2_relu3', '2_conv3', '1_relu3', '1_conv3',
-        'pool2', '2_relu2', '2_conv2', '1_relu2', '1_conv2', 'pool1', '2_relu1', '2_conv1', '1_relu1', '1_conv1']
+        deconv1_2 = Deconv_layer(self.get_conv_filter("conv1_2"),self.get_bias("conv1_2"), "deconv1_2")
+        deconv1_1 = Deconv_layer(self.get_conv_filter("conv1_1"),self.get_bias("conv1_1"),"deconv1_1")
+        #self.data_dict = None
+        #removed prob from list
+        layers_list = [fc8, fc7, fc6, unpool5,deconv5_4, deconv5_3, deconv5_2,deconv5_1,unpool4,deconv4_4,deconv4_3,deconv4_2,  deconv4_1,unpool3,deconv3_4,deconv3_3,deconv3_2,deconv3_1,unpool2,deconv2_2,deconv2_1,unpool1,deconv1_2,deconv1_1]
+        # removed prob from list
+        layer_names =['fc8',
+        'relu7', 'fc7', 'relu6', 'fc6', 'pool5', 'relu5_4', 'conv5_4', 'relu5_3', 'conv5_3', 'relu5_2', 'conv5_2',
+        'relu5_1', 'conv5_1', 'pool4', 'relu4_4', 'conv4_4', 'relu4_4', 'conv4_3', 'relu4_2', 'conv4_1', 'relu4_1',
+        'conv4_1', 'pool3', 'relu3_4', 'conv3_4', 'relu3_4', 'conv3_3', 'relu3_2', 'conv3_2', 'relu3_1', 'conv3_1',
+        'pool2', 'relu2_2', 'conv2_2', 'relu2_1', 'conv2_1', 'pool1', 'relu1_2', 'conv1_2', 'relu1_1', 'conv1_1']
 
         self.layer_activations = OrderedDict(zip(layer_names,layers_list))
-        print("build model finished: %ds" % (time.time() - start_time))
+        print("Done. (%ds)" % (time.time() - start_time))
 
         ###rewrite above, no need to enter inbetween variables right
 
-    def compile(from_layer, features):
+    def compile(self,from_layer, features):
         """
         :param from_layer: string declaring the layer from which deconvolution is supposed to be started
         :param features: input features for corresponding layer
         :output : returns the output of the last layer of deconvnet
         """
         if from_layer.startswith('fc'):
-            shape_weights = tf.shape(self.get_fc_weight(self, from_layer))
+            shape_weights = tf.shape(self.get_fc_weight(from_layer))
             shape_features = features.shape
             if  shape_weights == shape_features:
                 pass
             else:
-                raise Exception("input has dimension: %d should be %d", %(shape_features,shape_features))
+                #TO DO: how to reference list, or give an output stamp for shape -> check in pami
+                raise Exception("input has dimension:" , shape_features.as_list() , "should be " ,shape_weights.as_list())
 
         if from_layer.startswith('conv'):
-            shape_weights = tf.shape(self.get_conv_filter(self, from_layer))
+            shape_weights = self.get_conv_filter(from_layer).get_shape()
             shape_features = features.shape
             if  shape_weights == shape_features:
                 pass
             else:
-                raise Exception("input has dimension: %d should be %d", %(shape_features,shape_features))
+                pass
+               # import pdb; pdb.set_trace()
+
+               # raise Exception("input has dimension", shape_features.as_list(), " should be" ,shape_weights.as_list())
             
-        for name, layer in self.layer_activations.iteritems():
+        for name, layer in self.layer_activations.items():
+            import pdb; pdb.set_trace()
+            
             if from_layer is not None:
                 if from_layer != name:
                     continue
             else: 
                 from_layer = None
+                x = name
             x = layer(x)
             if name == 'fc8':
                 x = tf.nn.relu(x)
@@ -103,10 +114,12 @@ class Vgg19_deconv(argmax_dict, data_path = None):
                 x = tf.nn.relu(x)
             layer_x = x
             self.layer_activations[name] = layer_x
+            print("shape of layer %s is" % (name), layer_x.get_shape() )
         return layer_x
 
             
     def get_conv_filter(self, name):
+        assert self.data_dict is not None  , "Data dictionary is empty "
         return tf.constant(self.data_dict[name][0], name="filter")
 
     def get_bias(self, name):
@@ -115,7 +128,7 @@ class Vgg19_deconv(argmax_dict, data_path = None):
     def get_fc_weight(self, name):
         return tf.constant(self.data_dict[name][0], name="weights")
 
- class Fc_layer(self, bottom, name):
+class Fc_layer():
 
     def __init__(self,name):
          self.name = name
@@ -139,11 +152,11 @@ class Vgg19_deconv(argmax_dict, data_path = None):
     def __call__(self,x):
         return self.fc_layer(x,self.name)
 
- class  Deconv_layer(object):
+class  Deconv_layer(object):
 
-     def __init__(self, W,b name):
-     self.W = W #self.get_conv_filter(name[2:])
-     self.b = b # self.get_bias(name[2:])
+     def __init__(self, W,b,name):
+        self.W = W #self.get_conv_filter(name[2:])
+        self.b = b # self.get_bias(name[2:])
 
      def __call__(self, x):
          """
@@ -154,7 +167,7 @@ class Vgg19_deconv(argmax_dict, data_path = None):
      
          return tf.nn.conv2d_transpose(x, self.W, out_shape, [1, 1, 1, 1], padding=padding) + self.b
 
- class Unpool_layer(object):
+class Unpool_layer(object):
 
     def __init__(self, raveled_argmax,name):
         self.name = name
@@ -167,15 +180,15 @@ class Vgg19_deconv(argmax_dict, data_path = None):
         return tf.stack(output_list)
 
     def unpool(self, x, raveled_argmax, name):
-        if name = "unpool5":
+        if name == "unpool5":
             name = "conv5_4"
-        elif name = "unpool4":
+        elif name == "unpool4":
             name = "conv4_4"
-        elif name = "unpool3":
+        elif name == "unpool3":
             name = "conv3_4"
-        elif name = "unpool2":
+        elif name == "unpool2":
             name = "conv2_2"
-        elif name = "unpool1":
+        elif name == "unpool1":
             name = "conv1_2"
             
         out_shape = tf.shape(self.get_conv_filter(name))
@@ -209,3 +222,15 @@ class Vgg19_deconv(argmax_dict, data_path = None):
 
     def __call__(self,x):
         return self.unpool(x,self.raveled_argmax,self.name)
+
+
+
+if __name__ == '__main__': 
+    from vgg19 import Vgg19
+    net = Vgg19()
+    rand = tf.random_normal([4,224,224,3], dtype = 'float32')
+    net.build(rand)
+    deconv_net = Vgg19_deconv(net.argmax_dict)
+    deconv_net.build()
+    import pdb; pdb.set_trace()
+    deconv_net.compile('conv4_4', net.conv4_4)

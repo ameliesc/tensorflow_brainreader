@@ -84,6 +84,8 @@ class Vgg19():
         self.data_dict = None
         print("build model finished: %ds" % (time.time() - start_time))
 
+        self.argmax_dict = {'pool1' : self.argmax1, 'pool2' : self.argmax2, 'pool3' : self.argmax3, 'pool4' : self.argmax4, 'pool5' : self.argmax5}
+
     def avg_pool(self, bottom, name):
         return tf.nn.avg_pool(bottom, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME', name=name)
 
@@ -151,3 +153,4 @@ if __name__ == '__main__':
     net = Vgg19()
     rand = tf.random_normal([4,224,224,3], dtype = 'float32')
     net.build(rand)
+    
